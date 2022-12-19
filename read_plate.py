@@ -1,4 +1,4 @@
-import pytesseract
+# import pytesseract
 # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 import cv2
 from lib_detection import load_model, detect_lp, im2single
@@ -37,7 +37,7 @@ side = int(ratio * Dmin)
 bound_dim = min(side, Dmax)
 
 _ , LpImg, lp_type = detect_lp(wpod_net, im2single(Ivehicle), bound_dim, lp_threshold=0.5)
-
+# print(_)
 print("Loai bien so",lp_type)
 if (len(LpImg)):
 

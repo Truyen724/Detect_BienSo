@@ -10,7 +10,9 @@ def load_model(path):
     return model
 model = model_from_json("wpod-net_update1.json")
 vid = cv2.VideoCapture(0)
-while(True):
-    ret, frame = vid.read()
-    model.predict(frame)
+# while(True):
+#     ret, frame = vid.read()
+#     frame = frame.reshape((1, frame.shape[0], frame.shape[1], frame.shape[2]))
+#     model.predict(frame)
+    
     
