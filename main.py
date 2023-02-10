@@ -1,5 +1,6 @@
 from paddleocr import PaddleOCR
 import os
+import database
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import cv2
 import numpy as np
@@ -9,6 +10,8 @@ from keras.models import model_from_json
 from lib_detection import load_model, detect_lp, im2single
 from os.path import splitext
 from lib_detection import load_model, detect_lp, im2single
+# Kết nói database
+
 # Dinh nghia cac ky tu tren bien so
 char_list =  '0123456789ABCDEFGHKLMNPRSTUVXYZ'
 wpod_net_path = "wpod-net_update1.json"
@@ -71,7 +74,9 @@ def get_detect(mat):
         for i in txt[0]:
             if(i in char_list):
                 out += i 
+
     return out
+list_detect = {}
 def play_camera(id):
     vid = cv2.VideoCapture(id)
     while(True):
@@ -98,8 +103,9 @@ def play_camera(id):
                     binary = cv2.threshold(gray, 127, 255,
                                         cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
                     text = get_detect(binary)
+                    list_detect[text]+=1
                     print(text)
-
+                    
             except:
                 pass
             cv2.imshow('frame', frame)
@@ -108,6 +114,7 @@ def play_camera(id):
                 cv2.destroyAllWindows()
                 break
     cv2.destroyAllWindows()
+
 if __name__ == '__main__':
     # play_camera("../Bien_so.mp4")
     play_camera(0)

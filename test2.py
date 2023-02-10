@@ -1,18 +1,14 @@
-from keras.models import model_from_json
-from os.path import splitext
-import  cv2
-def load_model(path):
-    path = splitext(path)[0]
-    with open('%s.json' % path, 'r') as json_file:
-        model_json = json_file.read()
-    model = model_from_json(model_json, custom_objects={})
-    model.load_weights('%s.h5' % path)
-    return model
-model = model_from_json("wpod-net_update1.json")
-vid = cv2.VideoCapture(0)
-# while(True):
-#     ret, frame = vid.read()
-#     frame = frame.reshape((1, frame.shape[0], frame.shape[1], frame.shape[2]))
-#     model.predict(frame)
-    
-    
+from sqlalchemy.engine import URL
+connection_string = "DRIVER={ODBC Driver 17 for SQL Server};SERVER=DESKTOP-O41267U;DATABASE=Detect_bienso;Trusted_Connection=yes"
+connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": connection_string})
+
+from sqlalchemy import create_engine
+engine = create_engine(connection_url)
+
+# import pandas as pd
+# data = pd.read_sql_query("Insert into Driver(ID_driver, Driver_Name ,Dateofbirth) values ('5',N'Nguyễn Thị Tiểu Thuyết','19960714')", engine)
+# print(data.head())
+from sqlalchemy import text
+
+with engine.connect() as connection:
+    result = connection.execute(text("Insert into Driver(ID_driver, Driver_Name ,Dateofbirth) values ('5',N'Nguyễn Thị Tiểu Thuyết','19960714')"))
