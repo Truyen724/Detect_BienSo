@@ -10,8 +10,9 @@ from keras.models import model_from_json
 from lib_detection import load_model, detect_lp, im2single
 from os.path import splitext
 from lib_detection import load_model, detect_lp, im2single
-# Kết nói database
-
+import database
+import time
+import base64
 # Dinh nghia cac ky tu tren bien so
 char_list =  '0123456789ABCDEFGHKLMNPRSTUVXYZ'
 wpod_net_path = "wpod-net_update1.json"
@@ -77,7 +78,21 @@ def get_detect(mat):
 
     return out
 list_detect = {}
-def play_camera(id):
+num_images = 7
+list_delay ={}
+time_delay = 30
+def send_image(text,id_camera):
+    global list_detect
+    if "img_"+text+"1" not in list_detect:
+        list_detect["img_"+text+"1"] = "0"
+    if "img_"+text+"2" not in list_detect:
+        list_detect["img_"+text+"2"] = "0"
+    img1 = base64.b64encode(list_detect["img_"+text+"1"])
+    img2 = base64.b64encode(list_detect["img_"+text+"2"])
+    database.add_action(text,img1,img2,id_camera)
+def play_camera(id,id_camera):
+    global list_detect
+    global list_delay
     vid = cv2.VideoCapture(id)
     while(True):
         ret, frame = vid.read()
@@ -90,7 +105,6 @@ def play_camera(id):
             ratio = float(max(frame.shape[:2])) / min(frame.shape[:2])
             side = int(ratio * Dmin)
             bound_dim = min(side, Dmax)
-            
             try:
                 _ , LpImg, lp_type = detect_lp(wpod_net, im2single(frame), bound_dim, lp_threshold=0.5)
                 if (len(LpImg)):
@@ -103,18 +117,30 @@ def play_camera(id):
                     binary = cv2.threshold(gray, 127, 255,
                                         cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
                     text = get_detect(binary)
-                    list_detect[text]+=1
+                    if(text not in list_delay):
+                        if(text  in list_detect):
+                            list_detect[text]+=1
+                            list_detect["img_"+text+id_camera] = frame
+                        else:
+                            list_detect[text] = 1
+                            list_detect["img_"+text+id_camera] = frame
+                        if(list_detect[text]>num_images):
+                            list_delay[text] = time.time()
+                            send_image(text,id_camera)
+                            list_detect = {}
+                            
+                    for x in list_delay.keys():
+                        if(time.time() -list_delay[x] >time_delay):
+                            list_delay.pop(x)
                     print(text)
-                    
             except:
                 pass
             cv2.imshow('frame', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
-                
                 cv2.destroyAllWindows()
                 break
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     # play_camera("../Bien_so.mp4")
-    play_camera(0)
+    play_camera(0,"1")
