@@ -78,18 +78,29 @@ def get_detect(mat):
 
     return out
 list_detect = {}
-num_images = 7
+num_images = 5
 list_delay ={}
 time_delay = 30
 def send_image(text,id_camera):
     global list_detect
     if "img_"+text+"1" not in list_detect:
-        list_detect["img_"+text+"1"] = "0"
+        img1 = "img1"
+        print("loi111111")
+    else:
+        print("loi222222")
+        img1 = base64.b64encode(list_detect["img_"+text+"1"])
+        
     if "img_"+text+"2" not in list_detect:
-        list_detect["img_"+text+"2"] = "0"
-    img1 = base64.b64encode(list_detect["img_"+text+"1"])
-    img2 = base64.b64encode(list_detect["img_"+text+"2"])
+        print("loi333333")
+        img2 = "img2"
+    else:
+        print("loi444444")
+        img2 = base64.b64encode(list_detect["img_"+text+"2"])
+
+    print("den day roi")
+    
     database.add_action(text,img1,img2,id_camera)
+    print("xong")
 def play_camera(id,id_camera):
     global list_detect
     global list_delay
@@ -105,36 +116,48 @@ def play_camera(id,id_camera):
             ratio = float(max(frame.shape[:2])) / min(frame.shape[:2])
             side = int(ratio * Dmin)
             bound_dim = min(side, Dmax)
+
             try:
                 _ , LpImg, lp_type = detect_lp(wpod_net, im2single(frame), bound_dim, lp_threshold=0.5)
-                if (len(LpImg)):
-                    # Chuyen doi anh bien so
-                    LpImg[0] = cv2.convertScaleAbs(LpImg[0], alpha=(255.0))
-                    # Chuyen anh bien so ve gray
-                    gray = cv2.cvtColor( LpImg[0], cv2.COLOR_BGR2GRAY)
-                    # cv2.imshow("Anh bien so sau chuyen xam", gray)
-                    # Ap dung threshold de phan tach so va nen
-                    binary = cv2.threshold(gray, 127, 255,
-                                        cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-                    text = get_detect(binary)
+            except :
+                pass
+            if (len(LpImg)):
+                # Chuyen doi anh bien so
+                LpImg[0] = cv2.convertScaleAbs(LpImg[0], alpha=(255.0))
+                # Chuyen anh bien so ve gray
+                gray = cv2.cvtColor( LpImg[0], cv2.COLOR_BGR2GRAY)
+                # cv2.imshow("Anh bien so sau chuyen xam", gray)
+                # Ap dung threshold de phan tach so va nen
+                binary = cv2.threshold(gray, 127, 255,
+                                    cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+                text = get_detect(binary)
+                if text=="" or text==None:
+                    pass
+                else:
                     if(text not in list_delay):
                         if(text  in list_detect):
                             list_detect[text]+=1
                             list_detect["img_"+text+id_camera] = frame
+                            print(list_detect[text])
+                            print(text)
                         else:
                             list_detect[text] = 1
                             list_detect["img_"+text+id_camera] = frame
-                        if(list_detect[text]>num_images):
-                            list_delay[text] = time.time()
+                            print(list_detect[text])
+                            print(text)
+                        if(int(list_detect[text])>num_images):
+                            print(list_detect[text])
+                            print(text)
                             send_image(text,id_camera)
+                            list_delay[text] = time.time()
+                            
                             list_detect = {}
                             
                     for x in list_delay.keys():
                         if(time.time() -list_delay[x] >time_delay):
                             list_delay.pop(x)
-                    print(text)
-            except:
-                pass
+                print(text)
+
             cv2.imshow('frame', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
