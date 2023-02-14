@@ -88,19 +88,26 @@ def send_image(text,id_camera):
         print("loi111111")
     else:
         print("loi222222")
-        img1 = str(base64.b64encode(list_detect["img_"+text+"1"])).replace("'","")
-        
+        img1 = get_base64(list_detect["img_"+text+"1"], "img1")
+        # img1 = base64.b64encode(list_detect["img_"+text+"1"]).decode('utf-8')
     if "img_"+text+"2" not in list_detect:
         print("loi333333")
         img2 = "img2"
     else:
         print("loi444444")
-        img2 = str(base64.b64encode(list_detect["img_"+text+"2"])).replace("'","")
-
+        img2 = get_base64(list_detect["img_"+text+"2"], "img2")
+        # img2 = base64.b64encode(list_detect["img_"+text+"2"]).decode('utf-8')
     print("den day roi")
-    
     database.add_action(text,img1,img2,id_camera)
     print("xong")
+def get_base64(img, name):
+    cv2.imwrite(name+".png", img)
+    converted_string = ""
+    with open("me2.png", "rb") as image2string:
+        converted_string = base64.b64encode(image2string.read())
+    os.remove(name+".png")
+    
+    return str(converted_string.decode("utf-8")).replace("'","")
 def play_camera(id,id_camera):
     global list_detect
     global list_delay
