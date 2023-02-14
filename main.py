@@ -88,14 +88,14 @@ def send_image(text,id_camera):
         print("loi111111")
     else:
         print("loi222222")
-        img1 = base64.b64encode(list_detect["img_"+text+"1"])
+        img1 = str(base64.b64encode(list_detect["img_"+text+"1"])).replace("'","")
         
     if "img_"+text+"2" not in list_detect:
         print("loi333333")
         img2 = "img2"
     else:
         print("loi444444")
-        img2 = base64.b64encode(list_detect["img_"+text+"2"])
+        img2 = str(base64.b64encode(list_detect["img_"+text+"2"])).replace("'","")
 
     print("den day roi")
     
