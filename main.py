@@ -103,7 +103,7 @@ def send_image(text,id_camera):
 def get_base64(img, name):
     cv2.imwrite(name+".png", img)
     converted_string = ""
-    with open("me2.png", "rb") as image2string:
+    with open(name+".png", "rb") as image2string:
         converted_string = base64.b64encode(image2string.read())
     os.remove(name+".png")
     
