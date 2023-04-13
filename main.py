@@ -106,7 +106,6 @@ def get_base64(img, name):
     with open(name+".png", "rb") as image2string:
         converted_string = base64.b64encode(image2string.read())
     os.remove(name+".png")
-    
     return str(converted_string.decode("utf-8")).replace("'","")
 def play_camera(id,id_camera):
     global list_detect

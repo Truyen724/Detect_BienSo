@@ -8,6 +8,11 @@ import time
 from datetime import datetime
 def current_milli_time():
     return round(time.time() * 1000)
+def save(filename, text):
+    with open(filename, "w") as file:
+        file.write(text)
+    file.close()
+save("t.txt","hello1")
 def add_action(id_car, image1, image2, id_camera):
     id_action = current_milli_time()
     now = datetime.now()
@@ -17,6 +22,8 @@ def add_action(id_car, image1, image2, id_camera):
     Id_parkinglot = get_parking_id(id_camera)
     print("loi 1")
     query = "Insert into Action(ID_action, ID_car, Image, Image2, In_or_out, Time,Id_parkinglot) values ({id_action},'{id_car}','{image1}','{image2}','{state}','{Time}','{Id_parkinglot}')".format(id_action=id_action,id_car = id_car,image1=image1,image2=image2,state=state,Time = Time, Id_parkinglot=Id_parkinglot)
+    text_save = str(id_action) +"|"+ id_car  +"|"+ str(Time)  +"|"+ str(state)
+    save("data.txt", text_save)
     with engine.connect() as connection:
         connection.execute(text(query))
     print("loi 2")
